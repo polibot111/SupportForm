@@ -49,11 +49,16 @@ namespace DataAccess
 
             #endregion
 
-            #region 
+            #region Services
             services.AddScoped<IRoleService, RoleService>();
             services.AddScoped<IUserService, UserService>();
             services.AddScoped<ISupportFormService, SupportFormService>();
             services.AddScoped<IFormStatusService, FormStatusService>();
+            #endregion
+
+
+            #region DummyDataCreater
+            services.AddScoped<DummyDataCreater>();
             #endregion
         }
     }

@@ -26,7 +26,7 @@ namespace DataAccess.Services
         public async Task<bool> AddFormStatus(FormStatusInsertCommand request)
         {
             bool response = await _formStatusWriteRepo.AddRangeAsync(request.FormStatuses);
-             
+            await _formStatusWriteRepo.SaveAsync();
             return response;
         }
 

@@ -8,7 +8,7 @@ namespace DataAccess.Request.SupportForm
 {
     public class SupportFormInsertCommand
     {
-        public string UserId { get; set; }
+        public string? Username { get; set; }
         public string Subject { get; set; }
         public string Message{ get; set; }
 

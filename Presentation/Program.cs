@@ -1,9 +1,13 @@
 
 using DataAccess;
+using DataAccess.Contexts;
+using DataAccess.Services;
 using Infrastructure;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Presentation.Filters;
+using Presentation.Middleware;
 using System.Security.Claims;
 using System.Text;
 
@@ -59,6 +63,12 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
+#region Middlewares
+
+app.UseMiddleware<ExceptionMiddleware>();
+app.UseMiddleware<ResponseWrapperMiddleware>();
+
+#endregion
 
 app.UseCors();
 app.UseHttpsRedirection();
@@ -67,5 +77,16 @@ app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();
+
+using (var scope = app.Services.CreateScope())
+{
+    var serviceProvider = scope.ServiceProvider;
+    var dbContext = serviceProvider.GetRequiredService<AppDbContext>();
+    dbContext.Database.Migrate();
+
+    serviceProvider = scope.ServiceProvider;
+    var dummyDataCreater = serviceProvider.GetRequiredService<DummyDataCreater>();
+    await dummyDataCreater.Create();
+}
 
 app.Run();

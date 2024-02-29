@@ -8,6 +8,7 @@ namespace DataAccess.DTOs
 {
     public class SupportFormDTO
     {
+        public string Id { get; set; }
         public string Username { get; set; }
         public string Subject { get; set; }
         public string SupportFormStatus { get; set; }

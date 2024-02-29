@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using AutoMapper.QueryableExtensions;
+using Azure.Identity;
 using DataAccess.Abstracts.Repositories.FormStatus;
 using DataAccess.Abstracts.Repositories.SupportForm;
 using DataAccess.Abstracts.Services;
@@ -11,6 +12,7 @@ using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Claims;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -32,18 +34,18 @@ namespace DataAccess.Services
             _readFormStatusRepo = readFormStatusRepo;
         }
 
-
         public async Task<bool> AddForm(SupportFormInsertCommand request)
         {
-            string? UserName;
-            var FormStatus = await _readFormStatusRepo.GetSingleAsync(x => x.Code == 0);
 
-            var user = await _userManager.FindByIdAsync(request.UserId);
+            var formStatus = await _readFormStatusRepo.GetSingleAsync(x => x.Code == 0);
+
+
+            var user = await _userManager.FindByNameAsync(request.Username);
 
             var result = await _writeRepo.AddAsync(new SupportForm
             {
                 Subject = request.Subject,
-                FormStatus = FormStatus,
+                FormStatus = formStatus,
                 Message = request.Message,
                 User = user
             });
@@ -56,11 +58,34 @@ namespace DataAccess.Services
         public async Task<IQueryable<SupportFormDTO>> GetAllForms()
         {
 
-                var supportForms = await _readRepo.Table.Include(x => x.FormStatus).Include(x => x.User).ToListAsync();
-                IQueryable<SupportFormDTO> response = supportForms.AsQueryable().ProjectTo<SupportFormDTO>(_mapper.ConfigurationProvider);
-                return response;
- 
-          
+            var supportForms = await _readRepo.Table.Include(x => x.FormStatus).Include(x => x.User).ToListAsync();
+            IQueryable<SupportFormDTO> response = supportForms.AsQueryable().ProjectTo<SupportFormDTO>(_mapper.ConfigurationProvider);
+            return response;
+
+
+        }
+
+        public async Task<bool> AddFormToDummyDataCreater(SupportFormInsertCommand request)
+        {
+            var FormStatusList = await _readFormStatusRepo.GetAllAsync();
+            var FormStatusList2 = await FormStatusList.ToListAsync();
+            Random rnd = new Random();
+            int sayi = rnd.Next(0,FormStatusList2.Count);
+            var formStatus = FormStatusList2[sayi];
+
+            var user = await _userManager.FindByNameAsync(request.Username);
+
+            var result = await _writeRepo.AddAsync(new SupportForm
+            {
+                Subject = request.Subject,
+                FormStatus = formStatus,
+                Message = request.Message,
+                User = user
+            });
+
+            await _writeRepo.SaveAsync();
+            return result;
+
         }
     }
 }
