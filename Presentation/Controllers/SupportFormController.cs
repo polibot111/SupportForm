@@ -7,6 +7,8 @@ using Infrastructure.Enums;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using System.Security.Claims;
+using System.Threading.Tasks;
 
 namespace Presentation.Controllers
 {
@@ -15,18 +17,19 @@ namespace Presentation.Controllers
     [Authorize(AuthenticationSchemes = "Admin")]
     public class SupportFormController : ControllerBase
     {
-        public SupportFormController(ISupportFormService supportFormService)
+        private readonly ISupportFormService _supportFormService;
+        private readonly IHttpContextAccessor _httpContextAccessor;
+
+        public SupportFormController(ISupportFormService supportFormService, IHttpContextAccessor httpContextAccessor)
         {
             _supportFormService = supportFormService;
+            _httpContextAccessor = httpContextAccessor;
         }
-        readonly ISupportFormService _supportFormService;
 
         [HttpGet]
         public async Task<IActionResult> GetForms()
         {
-
-           return Ok(await _supportFormService.GetAllForms());
-
+            return Ok(await _supportFormService.GetAllForms());
         }
 
         [HttpPost("[action]")]
@@ -34,8 +37,8 @@ namespace Presentation.Controllers
             Definition = "Create Support Form")]
         public async Task<IActionResult> CreateForm([FromBody] SupportFormInsertCommand request)
         {
+            request.Username = _httpContextAccessor.HttpContext.User.FindFirstValue(ClaimTypes.Name);
             return Ok(await _supportFormService.AddForm(request));
         }
-
     }
 }

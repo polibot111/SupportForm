@@ -16,7 +16,7 @@ namespace DataAccess.Mapper
             CreateMap<SupportForm, SupportFormDTO>().
                 ForMember(x => x.Username, opt => opt.MapFrom(src => src.User != null ? src.User.UserName : null))
                 .ForMember(x => x.SupportFormStatus, opt => opt.MapFrom(src => src.FormStatus.Value))
-                .ForMember(x => x.Date, opt => opt.MapFrom(src => src.CreatedDate));
+                .ForMember(x => x.Date, opt => opt.MapFrom(src => src.UpdatedDate != null ? src.UpdatedDate : src.CreatedDate));
 
             CreateMap<Role,RoleDTO>()
                  .ForMember(x => x.RoleName, opt => opt.MapFrom(src => src.Name));

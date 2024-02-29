@@ -12,5 +12,6 @@ namespace DataAccess.Abstracts.Services
     {
         Task<IQueryable<SupportFormDTO>> GetAllForms();
         Task<bool> AddForm(SupportFormInsertCommand request);
+        Task<bool> AddFormToDummyDataCreater(SupportFormInsertCommand request);
     }
 }

@@ -1,0 +1,23 @@
+version: '3.4'
+
+services:
+
+   
+  presentation:
+    image: ${DOCKER_REGISTRY-}presentation
+    build:
+      context: .
+      dockerfile: Presentation/Dockerfile
+    environment:
+      - ConnectionStrings__DatabaseConnection=Server=mssql;Database=SupportFromDb;User Id=sa;Password=123456Aa;TrustServerCertificate=True;
+    container_name: "SupportFormProject"
+
+  mssql:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    environment:
+      SA_PASSWORD: "123456Aa"
+      ACCEPT_EULA: "Y"
+      TrustServerCertificate: "True" 
+    ports:
+      - "1433:1433"
+    container_name: "Mysql_Container"

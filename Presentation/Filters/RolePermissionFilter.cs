@@ -38,7 +38,7 @@ namespace Presentation.Filters
 
                 if (!hasRole)
                 {
-                    context.Result = new ForbidResult();
+                    context.Result = new StatusCodeResult(403);
                 }
                 else
                 {
